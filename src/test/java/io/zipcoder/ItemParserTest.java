@@ -12,9 +12,9 @@ public class ItemParserTest {
 
     private String rawSingleItem =    "naMe:Milk;price:3.23;type:Food;expiration:1/25/2016##";
 
-    private String rawSingleItemIrregularSeperatorSample = "naMe:MiLK;price:3.23;type:Food^expiration:1/11/2016##";
+    private String rawBrokenSingleItem =    "naMe:Milk;price:3.23;type:Food'expiration:1/25/2016##";
 
-    private String rawBrokenSingleItem =    "naMe:Milk;price:3.23;type:Food;expiration:1/25/2016##";
+    private String rawBrokenSingleItemWithEmptyValue =    "naMe:;price:3.23;type:Food;expiration:1/25/2016##";
 
     private String rawMultipleItems = "naMe:Milk;price:3.23;type:Food;expiration:1/25/2016##"
                                       +"naME:BreaD;price:1.23;type:Food;expiration:1/02/2016##"
@@ -43,20 +43,31 @@ public class ItemParserTest {
 
     @Test(expected = ItemParseException.class)
     public void parseBrokenStringIntoItemTest() throws ItemParseException{
-        itemParser.parseStringIntoItem(rawBrokenSingleItem);
+            itemParser.parseStringIntoItem(rawBrokenSingleItem);
     }
 
     @Test
-    public void findKeyValuePairsInRawItemDataTest(){
+    public void findKeyValuePairsInRawItemDataTest() throws ItemParseException {
         Integer expected = 4;
         Integer actual = itemParser.findKeyValuePairsInRawItemData(rawSingleItem).size();
         assertEquals(expected, actual);
     }
 
+    @Test(expected = ItemParseException.class)
+    public void shouldThrowItemParseExceptionWhenKeyValuePairTotalIsDifferentThan4() throws ItemParseException {
+        itemParser.findKeyValuePairsInRawItemData(rawBrokenSingleItem).size();
+    }
+
     @Test
-    public void findKeyValuePairsInRawItemDataTestIrregular(){
+    public void findKeyValuePairsInRawItemDataTestIrregular() throws ItemParseException {
         Integer expected = 4;
+        String rawSingleItemIrregularSeperatorSample = "naMe:MiLK;price:3.23;type:Food^expiration:1/11/2016##";
         Integer actual = itemParser.findKeyValuePairsInRawItemData(rawSingleItemIrregularSeperatorSample).size();
         assertEquals(expected, actual);
+    }
+
+    @Test(expected = ItemParseException.class)
+    public void shouldThrowItemParseExceptionWhenValueIsEmpty() throws ItemParseException {
+        itemParser.parseStringIntoItem(rawBrokenSingleItemWithEmptyValue);
     }
 }
